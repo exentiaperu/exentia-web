@@ -133,7 +133,9 @@ function calcular(){
  lineas.push('CLASIFICACIÓN INTERNA: '+nivel);
  lineas.push('PUNTAJE: '+puntos);
  lineas.push('TIPO DE NECESIDAD: '+([...(document.querySelectorAll('input[name="tipo"]:checked'))][0]?.value||'Recurrente'));
- lineas.push('RANGO PRELIMINAR: S/ '+min.toLocaleString('es-PE')+' – S/ '+max.toLocaleString('es-PE')+' + IGV');
+ lineas.push('MÍNIMO PRELIMINAR: S/ '+min.toLocaleString('es-PE')+' + IGV');
+ lineas.push('RECOMENDADO PRELIMINAR: S/ '+recomendado.toLocaleString('es-PE')+' + IGV');
+ lineas.push('MÁXIMO PRELIMINAR: S/ '+max.toLocaleString('es-PE')+' + IGV');
  lineas.push('SIGUIENTE PASO: completar diagnóstico detallado antes de emitir cotización final.');
  lineas.push('');
  lineas.push('*Tarifa referencial sujeta a validación del alcance y documentación.*');
@@ -145,7 +147,8 @@ function calcular(){
    const puntual=servicios.some(s=>['Contrato / documento legal','Carta / escrito / respuesta','Declaración o trámite específico','Constitución de empresa','Due diligence / revisión','Regularización contable o tributaria','Otro servicio específico'].includes(s));
    if(puntual){min=Math.max(250,min);max=Math.max(500,max)}
  }
- document.getElementById('precio').textContent='Estimación preliminar: S/ '+min.toLocaleString('es-PE')+' – S/ '+max.toLocaleString('es-PE')+' + IGV';
+ const recomendado=Math.round(((min+max)/2)/50)*50;
+ document.getElementById('precio').innerHTML='Mínimo: S/ '+min.toLocaleString('es-PE')+' · <strong>Recomendado: S/ '+recomendado.toLocaleString('es-PE')+'</strong> · Máximo: S/ '+max.toLocaleString('es-PE')+' + IGV';
  document.getElementById('resumen').textContent=resumen;
  document.getElementById('resultado').style.display='block';
  document.getElementById('resultado').scrollIntoView({behavior:'smooth'});

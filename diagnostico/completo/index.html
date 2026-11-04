@@ -75,6 +75,20 @@ label{display:block;font-size:.83rem;font-weight:800;color:var(--navy);margin-bo
 <div><label>Número de entidades / partes involucradas</label><input id="partes" type="number" min="1" value="1"></div>
 <div><label>Número de periodos a revisar</label><input id="periodos" type="number" min="1" value="1"></div>
 <div class="full"><label>Alcance específico</label><textarea id="alcance" placeholder="Ej.: contrato de prestación de servicios, respuesta a requerimiento, rectificatoria, revisión de 3 periodos, etc."></textarea></div>
+<div class="full hide" id="legalPartnerBox">
+  <div class="section-title" style="margin-top:8px">Servicio legal con socia estratégica</div>
+  <div class="grid">
+    <div><label>Honorario base de la abogada (S/)</label><input id="honorarioAbogada" type="number" min="0" step="50" value="0"></div>
+    <div><label>Nivel de intervención de EXENTIA</label>
+      <select id="gestionLegal">
+        <option value="baja">Derivación y coordinación básica</option>
+        <option value="media" selected>Seguimiento, documentos y coordinación</option>
+        <option value="alta">Gestión integral + soporte contable/tributario</option>
+      </select>
+    </div>
+  </div>
+  <div class="note" style="margin-top:10px">Los gastos notariales, registrales, tasas y otros terceros se cotizan por separado.</div>
+</div>
 <div class="full"><div class="checks">
 <label class="check"><input type="checkbox" data-pun value="Revisión documental extensa" data-p="5"> Revisión documental extensa</label>
 <label class="check"><input type="checkbox" data-pun value="Investigación normativa" data-p="6"> Investigación normativa</label>
@@ -109,10 +123,16 @@ function n(id){return Number(document.getElementById(id).value||0)}
 function v(id){return document.getElementById(id).value.trim()}
 function check(sel){return [...document.querySelectorAll(sel+':checked')]}
 function toggleTipo(){const p=document.getElementById('tipo').value==='puntual';document.getElementById('puntPanel').classList.toggle('hide',!p);document.getElementById('recurrPanel').classList.toggle('hide',p)}
-function toggleServicio(){const s=document.getElementById('servicio').value;if(['Contrato / documento legal','Constitución de empresa','Regularización contable o tributaria','Declaración / trámite específico','Due diligence / revisión','Otro servicio específico','Fiscalización / SUNAT'].includes(s)){document.getElementById('tipo').value='puntual'}else{document.getElementById('tipo').value='recurrente'}toggleTipo()}
+function toggleServicio(){
+ const s=document.getElementById('servicio').value;
+ if(['Contrato / documento legal','Constitución de empresa','Regularización contable o tributaria','Declaración / trámite específico','Due diligence / revisión','Otro servicio específico','Fiscalización / SUNAT'].includes(s)){document.getElementById('tipo').value='puntual'}else{document.getElementById('tipo').value='recurrente'}
+ toggleTipo();
+ const legal=['Contrato / documento legal','Constitución de empresa'].includes(s);
+ document.getElementById('legalPartnerBox').classList.toggle('hide',!legal);
+}
 function calcular(){
  const tipo=document.getElementById('tipo').value, servicio=document.getElementById('servicio').value;
- let puntos=0, base=0, min=0, max=0, nivel='';
+ let puntos=0, base=0, min=0, recomendado=0, max=0, nivel='', legalInfo='';
  if(tipo==='recurrente'){
    const mov=n('ventas')+n('compras');
    if(mov<=40)puntos+=4; else if(mov<=100)puntos+=8; else if(mov<=250)puntos+=15; else puntos+=24;
@@ -124,7 +144,9 @@ function calcular(){
    if(servicio==='Planillas y laboral'){base=Math.max(150,t<=10?150:150+(t-10)*15)}
    else if(puntos<=14)base=300; else if(puntos<=28)base=650; else if(puntos<=44)base=1200; else if(puntos<=62)base=2200; else base=3500;
    nivel=puntos<=14?'Básico':puntos<=28?'Estándar':puntos<=44?'Intermedio':puntos<=62?'Complejo':'Corporativo';
-   min=Math.max(150,Math.round(base*.95/50)*50);max=Math.round(base*1.2/50)*50;
+   min=Math.max(150,Math.round(base*.95/50)*50);
+   recomendado=Math.max(min,Math.round(base*1.08/50)*50);
+   max=Math.max(recomendado,Math.round(base*1.2/50)*50);
  } else {
    let score=0;
    score+=Math.min(12,n('entregables')*2);
@@ -133,25 +155,52 @@ function calcular(){
    check('[data-pun]').forEach(x=>score+=Number(x.dataset.p||0));
    if(document.getElementById('urgencia').value==='48h')score+=6;
    if(document.getElementById('urgencia').value==='24h')score+=12;
-   const bases={'Contrato / documento legal':350,'Constitución de empresa':450,'Regularización contable o tributaria':450,'Declaración / trámite específico':250,'Due diligence / revisión':700,'Fiscalización / SUNAT':600,'Otro servicio específico':300,'Asesoría tributaria':350};
-   base=bases[servicio]||300;
-   base+=score*25;
+   const legal=['Contrato / documento legal','Constitución de empresa'].includes(servicio);
+   if(legal && n('honorarioAbogada')>0){
+     const h=n('honorarioAbogada');
+     const gestion=document.getElementById('gestionLegal').value;
+     let pctMin=.10,pctRec=.15,pctMax=.20,gestionMin=80;
+     if(gestion==='media'){pctMin=.15;pctRec=.20;pctMax=.25;gestionMin=100}
+     if(gestion==='alta'){pctMin=.20;pctRec=.25;pctMax=.30;gestionMin=150}
+     const mgMin=Math.max(gestionMin,h*pctMin);
+     const mgRec=Math.max(gestionMin,h*pctRec);
+     const mgMax=Math.max(gestionMin,h*pctMax);
+     min=Math.round((h+mgMin)/50)*50;
+     recomendado=Math.round((h+mgRec)/50)*50;
+     max=Math.round((h+mgMax)/50)*50;
+     base=recomendado;
+     legalInfo='Honorario abogada: S/ '+h.toLocaleString('es-PE')+' | Gestión EXENTIA sugerida: S/ '+Math.round(mgRec).toLocaleString('es-PE');
+   } else {
+     const bases={'Contrato / documento legal':350,'Constitución de empresa':450,'Regularización contable o tributaria':450,'Declaración / trámite específico':250,'Due diligence / revisión':700,'Fiscalización / SUNAT':600,'Otro servicio específico':300,'Asesoría tributaria':350};
+     base=(bases[servicio]||300)+score*25;
+     min=Math.max(250,Math.round(base*.9/50)*50);
+     recomendado=Math.max(min,Math.round(base/50)*50);
+     max=Math.max(recomendado,Math.round(base*1.15/50)*50);
+   }
    nivel=score<=10?'Simple':score<=24?'Moderado':score<=40?'Complejo':'Alta complejidad';
-   min=Math.max(250,Math.round(base*.9/50)*50);max=Math.round(base*1.15/50)*50;puntos=score;
+   puntos=score;
  }
- if(document.getElementById('docs').value==='No'){min=Math.round(min*1.15/50)*50;max=Math.round(max*1.2/50)*50}
+ if(document.getElementById('docs').value==='No'){
+   min=Math.round(min*1.15/50)*50;
+   recomendado=Math.round(recomendado*1.15/50)*50;
+   max=Math.round(max*1.2/50)*50;
+ }
  const rec=check('[data-rec]').map(x=>x.value), pun=check('[data-pun]').map(x=>x.value);
  const L=[];
  L.push('EMPRESA: '+(v('empresa')||'-'));L.push('RUC: '+(v('ruc')||'-'));L.push('CONTACTO: '+(v('contacto')||'-'));L.push('CORREO: '+(v('correo')||'-'));L.push('');
  L.push('TIPO: '+(tipo==='recurrente'?'Servicio recurrente / mensual':'Servicio puntual / único'));L.push('SERVICIO PRINCIPAL: '+servicio);L.push('COMPLEJIDAD: '+nivel);L.push('PUNTAJE INTERNO: '+puntos);L.push('');
  if(tipo==='recurrente'){L.push('VOLUMEN: '+n('ventas')+' ventas / '+n('compras')+' compras / '+n('movbanco')+' mov. bancarios');L.push('TRABAJADORES: '+n('trabajadores'));L.push('FACTORES: '+(rec.join(', ')||'Sin adicionales'))}
  else{L.push('ENTREGABLES: '+n('entregables'));L.push('PERIODOS: '+n('periodos'));L.push('URGENCIA: '+document.getElementById('urgencia').value);L.push('ALCANCE: '+(v('alcance')||'-'));L.push('FACTORES: '+(pun.join(', ')||'Sin adicionales'))}
- L.push('');L.push('RANGO RECOMENDADO: S/ '+min.toLocaleString('es-PE')+' – S/ '+max.toLocaleString('es-PE')+' + IGV');L.push('DOCUMENTACIÓN: '+document.getElementById('docs').value);L.push('REUNIONES INCLUIDAS: '+n('reuniones'));L.push('OBSERVACIONES: '+(v('obs')||'-'));L.push('');L.push('*Validar gastos notariales, registrales, tasas, traducciones, legalizaciones u otros terceros por separado cuando corresponda.*');
- document.getElementById('nivel').textContent='Complejidad: '+nivel;document.getElementById('precio').textContent='Rango recomendado: S/ '+min.toLocaleString('es-PE')+' – S/ '+max.toLocaleString('es-PE')+' + IGV';document.getElementById('resumen').textContent=L.join('\n');document.getElementById('resultado').style.display='block';document.getElementById('resultado').scrollIntoView({behavior:'smooth'});
+ L.push('');
+ if(legalInfo)L.push(legalInfo);
+ L.push('MÍNIMO SUGERIDO: S/ '+min.toLocaleString('es-PE')+' + IGV');
+ L.push('RECOMENDADO: S/ '+recomendado.toLocaleString('es-PE')+' + IGV');
+ L.push('MÁXIMO SUGERIDO: S/ '+max.toLocaleString('es-PE')+' + IGV');L.push('DOCUMENTACIÓN: '+document.getElementById('docs').value);L.push('REUNIONES INCLUIDAS: '+n('reuniones'));L.push('OBSERVACIONES: '+(v('obs')||'-'));L.push('');L.push('*Validar gastos notariales, registrales, tasas, traducciones, legalizaciones u otros terceros por separado cuando corresponda.*');
+ document.getElementById('nivel').textContent='Complejidad: '+nivel;document.getElementById('precio').innerHTML='Mínimo: S/ '+min.toLocaleString('es-PE')+' · <strong>Recomendado: S/ '+recomendado.toLocaleString('es-PE')+'</strong> · Máximo: S/ '+max.toLocaleString('es-PE')+' + IGV';document.getElementById('resumen').textContent=L.join('\n');document.getElementById('resultado').style.display='block';document.getElementById('resultado').scrollIntoView({behavior:'smooth'});
 }
 async function copiar(){await navigator.clipboard.writeText(document.getElementById('resumen').textContent);alert('Resumen copiado')}
 function limpiar(){location.reload()}
-toggleTipo()
+toggleServicio()
 </script>
 </body>
 </html>
