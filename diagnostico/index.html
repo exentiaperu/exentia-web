@@ -24,6 +24,7 @@ label{display:block;font-size:.84rem;font-weight:800;color:var(--navy);margin-bo
 <div class="panel">
 <div class="muted">Uso interno · Nueva llamada</div>
 <h1>Diagnóstico y cotización</h1>
+<div class="note" style="margin-bottom:18px">Usa este formulario para una primera llamada. El resultado es un rango preliminar interno. Para cerrar una propuesta, continúa al diagnóstico completo.</div>
 <div class="grid">
 <div><label>Empresa</label><input id="empresa" placeholder="Razón social o nombre comercial"></div>
 <div><label>RUC</label><input id="ruc" inputmode="numeric" placeholder="11 dígitos"></div>
@@ -38,6 +39,10 @@ label{display:block;font-size:.84rem;font-weight:800;color:var(--navy);margin-bo
 <div><label>Trabajadores</label><input id="trabajadores" type="number" min="0" value="0"></div>
 <div><label>Cuentas bancarias activas</label><input id="bancos" type="number" min="0" value="1"></div>
 
+<div class="full"><div class="section-title">Tipo de necesidad</div><div class="checks">
+<label class="check"><input type="radio" name="tipo" value="Recurrente" checked> Servicio recurrente / mensual</label>
+<label class="check"><input type="radio" name="tipo" value="Puntual"> Servicio puntual / único</label>
+</div></div>
 <div class="full"><div class="section-title">Servicios requeridos</div><div class="checks">
 <label class="check"><input type="checkbox" data-servicio value="Contabilidad integral"> Contabilidad integral</label>
 <label class="check"><input type="checkbox" data-servicio value="Asesoría tributaria"> Asesoría tributaria</label>
@@ -45,6 +50,12 @@ label{display:block;font-size:.84rem;font-weight:800;color:var(--navy);margin-bo
 <label class="check"><input type="checkbox" data-servicio value="Fiscalización / SUNAT"> Fiscalización / SUNAT</label>
 <label class="check"><input type="checkbox" data-servicio value="Legal / societario"> Legal / societario</label>
 <label class="check"><input type="checkbox" data-servicio value="Constitución de empresa"> Constitución de empresa</label>
+<label class="check"><input type="checkbox" data-servicio value="Contrato / documento legal"> Contrato / documento legal</label>
+<label class="check"><input type="checkbox" data-servicio value="Carta / escrito / respuesta"> Carta, escrito o respuesta</label>
+<label class="check"><input type="checkbox" data-servicio value="Regularización contable o tributaria"> Regularización contable o tributaria</label>
+<label class="check"><input type="checkbox" data-servicio value="Declaración o trámite específico"> Declaración o trámite específico</label>
+<label class="check"><input type="checkbox" data-servicio value="Due diligence / revisión"> Revisión / due diligence</label>
+<label class="check"><input type="checkbox" data-servicio value="Otro servicio específico"> Otro servicio específico</label>
 </div></div>
 
 <div class="full"><div class="section-title">Factores de complejidad</div><div class="checks">
@@ -62,7 +73,7 @@ label{display:block;font-size:.84rem;font-weight:800;color:var(--navy);margin-bo
 
 <div class="full"><label>Situación actual / observaciones</label><textarea id="obs" placeholder="Qué problema tiene hoy, desde cuándo, software, entregables esperados, etc."></textarea></div>
 </div>
-<div class="actions"><button class="btn primary" onclick="calcular()">Calcular diagnóstico</button><button class="btn secondary" onclick="limpiar()">Nueva llamada</button></div>
+<div class="actions"><button class="btn primary" onclick="calcular()">Calcular diagnóstico</button><a class="btn secondary" href="/diagnostico/completo/" style="text-decoration:none;display:inline-flex;align-items:center">Ir al diagnóstico completo →</a><button class="btn secondary" onclick="limpiar()">Nueva llamada</button></div>
 <div class="note">La tarifa es una referencia interna. Debe validarse antes de enviarse al cliente.</div>
 </div>
 
@@ -121,12 +132,20 @@ function calcular(){
  lineas.push('');
  lineas.push('CLASIFICACIÓN INTERNA: '+nivel);
  lineas.push('PUNTAJE: '+puntos);
- lineas.push('HONORARIO REFERENCIAL: S/ '+base.toLocaleString('es-PE')+' + IGV');
+ lineas.push('TIPO DE NECESIDAD: '+([...(document.querySelectorAll('input[name="tipo"]:checked'))][0]?.value||'Recurrente'));
+ lineas.push('RANGO PRELIMINAR: S/ '+min.toLocaleString('es-PE')+' – S/ '+max.toLocaleString('es-PE')+' + IGV');
+ lineas.push('SIGUIENTE PASO: completar diagnóstico detallado antes de emitir cotización final.');
  lineas.push('');
  lineas.push('*Tarifa referencial sujeta a validación del alcance y documentación.*');
  const resumen=lineas.join('\n');
  document.getElementById('nivel').textContent='Complejidad: '+nivel;
- document.getElementById('precio').textContent='Referencia: S/ '+base.toLocaleString('es-PE')+' + IGV';
+ let min=Math.max(150,Math.round(base*.9/50)*50), max=Math.round(base*1.25/50)*50;
+ const tipo=[...document.querySelectorAll('input[name="tipo"]:checked')][0]?.value||'Recurrente';
+ if(tipo==='Puntual'){
+   const puntual=servicios.some(s=>['Contrato / documento legal','Carta / escrito / respuesta','Declaración o trámite específico','Constitución de empresa','Due diligence / revisión','Regularización contable o tributaria','Otro servicio específico'].includes(s));
+   if(puntual){min=Math.max(250,min);max=Math.max(500,max)}
+ }
+ document.getElementById('precio').textContent='Estimación preliminar: S/ '+min.toLocaleString('es-PE')+' – S/ '+max.toLocaleString('es-PE')+' + IGV';
  document.getElementById('resumen').textContent=resumen;
  document.getElementById('resultado').style.display='block';
  document.getElementById('resultado').scrollIntoView({behavior:'smooth'});
