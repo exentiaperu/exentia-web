@@ -106,6 +106,13 @@ function calcular(){
    base=Math.max(150,trab<=10?150:150+(trab-10)*15);
  }
  const factores=selected('[data-factor]');
+ let min=Math.max(150,Math.round(base*.9/50)*50);
+ let max=Math.round(base*1.25/50)*50;
+ const tipo=[...document.querySelectorAll('input[name="tipo"]:checked')][0]?.value||'Recurrente';
+ if(tipo==='Puntual'){
+   const puntual=servicios.some(s=>['Contrato / documento legal','Carta / escrito / respuesta','Declaración o trámite específico','Constitución de empresa','Due diligence / revisión','Regularización contable o tributaria','Otro servicio específico'].includes(s));
+   if(puntual){min=Math.max(250,min);max=Math.max(500,max)}
+ }
  const recomendado=Math.round(((min+max)/2)/50)*50;
  const lineas=[];
  lineas.push('EMPRESA: '+(v('empresa')||'-'));
@@ -120,7 +127,7 @@ function calcular(){
  lineas.push('Ventas/comprobantes: '+n('ventas'));
  lineas.push('Compras/comprobantes: '+n('compras'));
  lineas.push('Trabajadores: '+trab);
- lineas.push('Bancos: '+bancos);
+ lineas.push('Cuentas bancarias activas: '+bancos);
  lineas.push('');
  lineas.push('SERVICIOS:');
  lineas.push(servicios.length?servicios.map(x=>'• '+x).join('\n'):'• No seleccionado');
@@ -142,12 +149,6 @@ function calcular(){
  lineas.push('*Tarifa referencial sujeta a validación del alcance y documentación.*');
  const resumen=lineas.join('\n');
  document.getElementById('nivel').textContent='Complejidad: '+nivel;
- let min=Math.max(150,Math.round(base*.9/50)*50), max=Math.round(base*1.25/50)*50;
- const tipo=[...document.querySelectorAll('input[name="tipo"]:checked')][0]?.value||'Recurrente';
- if(tipo==='Puntual'){
-   const puntual=servicios.some(s=>['Contrato / documento legal','Carta / escrito / respuesta','Declaración o trámite específico','Constitución de empresa','Due diligence / revisión','Regularización contable o tributaria','Otro servicio específico'].includes(s));
-   if(puntual){min=Math.max(250,min);max=Math.max(500,max)}
- }
  document.getElementById('precio').innerHTML='Mínimo: S/ '+min.toLocaleString('es-PE')+' · <strong>Recomendado: S/ '+recomendado.toLocaleString('es-PE')+'</strong> · Máximo: S/ '+max.toLocaleString('es-PE')+' + IGV';
  document.getElementById('resumen').textContent=resumen;
  document.getElementById('resultado').style.display='block';
