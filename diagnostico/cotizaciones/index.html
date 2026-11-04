@@ -37,14 +37,129 @@ input,select,button{font:inherit}input,select{width:100%;padding:12px 13px;borde
       <select id="estado"><option value="">Todos los estados</option><option>Borrador</option><option>Enviada</option><option>Negociación</option><option>Aprobada</option><option>Rechazada</option><option>Cliente cerrado</option><option>Archivada</option></select>
       <a class="btn primary" href="/diagnostico/completo/" style="text-decoration:none;text-align:center">Nueva cotización</a>
     </div>
-    <div class="notice" id="storageNotice"><strong>Base pendiente de conexión.</strong> La interfaz ya está lista, pero SharePoint todavía no está conectado. Hasta completar esa autorización, esta pantalla no guardará cotizaciones entre dispositivos.</div>
+    <div class="notice" id="storageNotice"><strong>Conectando con Microsoft 365...</strong> Cargando historial de cotizaciones.</div>
     <div class="table-wrap">
       <table>
         <thead><tr><th>Empresa</th><th>RUC</th><th>Servicio</th><th>Versión</th><th>Precio ofrecido</th><th>Estado</th><th>Fecha</th><th>Acciones</th></tr></thead>
-        <tbody id="rows"><tr><td colspan="8" class="empty">Aún no hay cotizaciones guardadas.</td></tr></tbody>
+        <tbody id="rows"><tr><td colspan="8" class="empty">Cargando cotizaciones...</td></tr></tbody>
       </table>
     </div>
   </div>
+  <div class="panel" id="detallePanel" style="display:none">
+    <div class="section-title" style="font-weight:900;color:var(--navy);margin-bottom:10px">Detalle de cotización</div>
+    <pre id="detalle" style="white-space:pre-wrap;background:#f8fafc;border:1px solid var(--line);padding:16px;border-radius:12px"></pre>
+  </div>
 </div>
+<script>
+let cotizaciones=[];
+
+function money(v){return 'S/ '+Number(v||0).toLocaleString('es-PE')}
+function esc(v){return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
+
+async function api(method,body){
+  const r=await fetch('/api/cotizaciones',{
+    method,
+    headers:{'Content-Type':'application/json'},
+    body:body?JSON.stringify(body):undefined
+  });
+  const data=await r.json().catch(()=>({}));
+  if(!r.ok)throw new Error(data.error||'Error al conectar con Microsoft 365');
+  return data;
+}
+
+function actualizarTarjetas(list){
+  document.getElementById('total').textContent=list.length;
+  document.getElementById('borradores').textContent=list.filter(x=>x.estado==='Borrador').length;
+  document.getElementById('negociacion').textContent=list.filter(x=>x.estado==='Negociación').length;
+  document.getElementById('cerradas').textContent=list.filter(x=>['Aprobada','Cliente cerrado'].includes(x.estado)).length;
+}
+
+function render(){
+  const q=document.getElementById('buscar').value.toLowerCase().trim();
+  const e=document.getElementById('estado').value;
+  const list=cotizaciones.filter(x=>{
+    const hay=(x.empresa+' '+x.ruc+' '+x.contacto).toLowerCase();
+    return (!q||hay.includes(q))&&(!e||x.estado===e);
+  });
+  actualizarTarjetas(cotizaciones);
+  const rows=document.getElementById('rows');
+  if(!list.length){rows.innerHTML='<tr><td colspan="8" class="empty">No hay cotizaciones que coincidan.</td></tr>';return}
+  rows.innerHTML=list.map(x=>`<tr>
+    <td>${esc(x.empresa||'-')}</td>
+    <td>${esc(x.ruc||'-')}</td>
+    <td>${esc(x.servicio||'-')}</td>
+    <td>v${Number(x.version||1)}</td>
+    <td>${money(x.precioOfrecido||x.recomendado)}</td>
+    <td><span class="badge">${esc(x.estado||'Borrador')}</span></td>
+    <td>${x.updatedAt?new Date(x.updatedAt).toLocaleDateString('es-PE'):'-'}</td>
+    <td>
+      <button class="btn secondary" onclick="ver('${x.id}')">Ver</button>
+      <button class="btn secondary" onclick="editar('${x.id}')">Editar</button>
+      <button class="btn secondary" onclick="eliminar('${x.id}')">Eliminar</button>
+    </td>
+  </tr>`).join('');
+}
+
+function ver(id){
+  const x=cotizaciones.find(q=>q.id===id); if(!x)return;
+  const txt=[
+    'EMPRESA: '+(x.empresa||'-'),
+    'RUC: '+(x.ruc||'-'),
+    'CONTACTO: '+(x.contacto||'-'),
+    'SERVICIO: '+(x.servicio||'-'),
+    'VERSIÓN: '+(x.version||1),
+    'ESTADO: '+(x.estado||'Borrador'),
+    '',
+    'MÍNIMO: '+money(x.min)+' + IGV',
+    'RECOMENDADO: '+money(x.recomendado)+' + IGV',
+    'PRECIO OFRECIDO: '+money(x.precioOfrecido||x.recomendado)+' + IGV',
+    'MÁXIMO: '+money(x.max)+' + IGV',
+    '',
+    x.resumen||''
+  ].join('\n');
+  document.getElementById('detalle').textContent=txt;
+  document.getElementById('detallePanel').style.display='block';
+  document.getElementById('detallePanel').scrollIntoView({behavior:'smooth'});
+}
+
+async function editar(id){
+  const x=cotizaciones.find(q=>q.id===id); if(!x)return;
+  const precio=prompt('Nuevo precio ofrecido sin IGV:',x.precioOfrecido||x.recomendado||0);
+  if(precio===null)return;
+  const estado=prompt('Estado: Borrador, Enviada, Negociación, Aprobada, Rechazada, Cliente cerrado o Archivada',x.estado||'Borrador');
+  if(estado===null)return;
+  const observaciones=prompt('Observaciones comerciales:',x.observacionesComerciales||'');
+  if(observaciones===null)return;
+  try{
+    const d=await api('PUT',{id,precioOfrecido:Number(precio||0),estado,observacionesComerciales:observaciones});
+    const i=cotizaciones.findIndex(q=>q.id===id); cotizaciones[i]=d.quote; render(); ver(id);
+    alert('Cotización actualizada. Se guardó como versión '+d.quote.version+'.');
+  }catch(e){alert(e.message)}
+}
+
+async function eliminar(id){
+  const x=cotizaciones.find(q=>q.id===id);
+  if(!confirm('¿Eliminar la cotización de '+(x?.empresa||'este cliente')+'? Esta acción la quitará del historial del panel.'))return;
+  try{await api('DELETE',{id});cotizaciones=cotizaciones.filter(q=>q.id!==id);render();document.getElementById('detallePanel').style.display='none'}catch(e){alert(e.message)}
+}
+
+async function cargar(){
+  try{
+    const d=await api('GET');
+    cotizaciones=d.quotes||[];
+    document.getElementById('storageNotice').innerHTML='<strong>Microsoft 365 conectado.</strong> El historial se guarda de forma centralizada y está disponible desde cualquier PC autorizado.';
+    document.getElementById('storageNotice').style.borderColor='#b8e3d4';
+    document.getElementById('storageNotice').style.background='#effaf6';
+    document.getElementById('storageNotice').style.color='#075e45';
+    render();
+  }catch(e){
+    document.getElementById('storageNotice').innerHTML='<strong>No se pudo conectar con Microsoft 365.</strong> '+esc(e.message);
+    document.getElementById('rows').innerHTML='<tr><td colspan="8" class="empty">No se pudo cargar el historial.</td></tr>';
+  }
+}
+document.getElementById('buscar').addEventListener('input',render);
+document.getElementById('estado').addEventListener('change',render);
+cargar();
+</script>
 </body>
 </html>

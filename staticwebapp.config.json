@@ -1,6 +1,12 @@
 {
   "routes": [
     {
+      "route": "/api/cotizaciones*",
+      "allowedRoles": [
+        "admin_exentia"
+      ]
+    },
+    {
       "route": "/login",
       "redirect": "/.auth/login/aad?post_login_redirect_uri=/diagnostico/"
     },
