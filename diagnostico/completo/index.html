@@ -32,7 +32,7 @@ label{display:block;font-size:.83rem;font-weight:800;color:var(--navy);margin-bo
 <div><label>RUC</label><input id="ruc"></div>
 <div><label>Contacto</label><input id="contacto"></div>
 <div><label>Correo</label><input id="correo" type="email"></div>
-<div><label>Tipo de servicio</label><select id="tipo" onchange="toggleTipo();toggleServicio()"><option value="recurrente">Recurrente / mensual</option><option value="puntual">Puntual / único</option></select></div>
+<div><label>Tipo de servicio</label><select id="tipo" onchange="toggleTipo()"><option value="recurrente">Recurrente / mensual</option><option value="puntual">Puntual / único</option></select></div>
 <div><label>Servicio principal</label><select id="servicio" onchange="toggleServicio()">
 <option>Contabilidad integral</option><option>Planillas y laboral</option><option>Asesoría tributaria</option><option>Fiscalización / SUNAT</option><option>Contrato / documento legal</option><option>Constitución de empresa</option><option>Regularización contable o tributaria</option><option>Declaración / trámite específico</option><option>Due diligence / revisión</option><option>Otro servicio específico</option>
 </select></div>
@@ -200,7 +200,7 @@ function calcular(){
 }
 async function copiar(){await navigator.clipboard.writeText(document.getElementById('resumen').textContent);alert('Resumen copiado')}
 function limpiar(){location.reload()}
-toggleTipo()
+toggleServicio()
 </script>
 </body>
 </html>
