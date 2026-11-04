@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="robots" content="noindex,nofollow,noarchive">
+<title>Diagnóstico Completo | EXENTIA</title>
+<style>
+:root{--navy:#0b1f3a;--blue:#0b63ce;--ink:#17263a;--muted:#68788b;--line:#e5ebf2;--soft:#f5f8fc;--ok:#0b8a60}
+*{box-sizing:border-box}body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;background:var(--soft);color:var(--ink)}
+.wrap{width:min(1160px,92%);margin:28px auto}.top{display:flex;justify-content:space-between;align-items:center;gap:20px;margin-bottom:22px}.brand{font-size:1.35rem;font-weight:900;color:var(--navy);letter-spacing:.06em}.muted{color:var(--muted)}
+.panel{background:#fff;border:1px solid var(--line);border-radius:22px;padding:26px;box-shadow:0 14px 38px rgba(15,48,90,.06);margin-bottom:18px}
+h1{font-size:clamp(2rem,4vw,3.2rem);line-height:1.05;color:var(--navy);margin:.2rem 0 1rem}.section-title{font-weight:900;color:var(--navy);font-size:1.03rem;margin:4px 0 15px}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:15px}.full{grid-column:1/-1}.thirds{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+label{display:block;font-size:.83rem;font-weight:800;color:var(--navy);margin-bottom:6px}input,select,textarea{width:100%;padding:12px;border:1px solid #ccd7e3;border-radius:10px;font:inherit;background:#fff}textarea{min-height:86px;resize:vertical}
+.checks{display:grid;grid-template-columns:repeat(2,1fr);gap:9px}.check{display:flex;gap:9px;align-items:center;padding:10px 12px;border:1px solid var(--line);border-radius:10px}.check input{width:auto}
+.hide{display:none}.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}.btn{border:0;border-radius:10px;padding:12px 16px;font-weight:850;cursor:pointer;text-decoration:none}.primary{background:var(--navy);color:#fff}.secondary{background:#eaf3ff;color:#0757bd}
+.result{display:none}.badge{display:inline-block;padding:7px 11px;border-radius:999px;background:#eaf3ff;color:#0757bd;font-weight:900}.price{font-size:2rem;font-weight:900;color:var(--navy);margin:10px 0}.summary{white-space:pre-wrap;background:#f8fafc;border:1px solid var(--line);padding:16px;border-radius:12px;margin-top:14px}.note{font-size:.82rem;color:var(--muted)}
+@media(max-width:760px){.grid,.checks,.thirds{grid-template-columns:1fr}.top{align-items:flex-start;flex-direction:column}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="top"><div><div class="brand">EXENTIA</div><div class="muted">Diagnóstico completo interno</div></div><div><a href="/diagnostico/" style="font-weight:800;color:#0b63ce;text-decoration:none;margin-right:18px">← Rápido</a><a href="/.auth/logout?post_logout_redirect_uri=/" style="font-weight:800;color:#0b63ce;text-decoration:none">Cerrar sesión</a></div></div>
+
+<div class="panel">
+<div class="muted">Cotización detallada</div>
+<h1>Diagnóstico completo</h1>
+<div class="note" style="margin-bottom:18px">Selecciona si es un servicio recurrente o puntual. Las preguntas cambian según el tipo de encargo.</div>
+
+<div class="grid">
+<div><label>Empresa</label><input id="empresa"></div>
+<div><label>RUC</label><input id="ruc"></div>
+<div><label>Contacto</label><input id="contacto"></div>
+<div><label>Correo</label><input id="correo" type="email"></div>
+<div><label>Tipo de servicio</label><select id="tipo" onchange="toggleTipo()"><option value="recurrente">Recurrente / mensual</option><option value="puntual">Puntual / único</option></select></div>
+<div><label>Servicio principal</label><select id="servicio" onchange="toggleServicio()">
+<option>Contabilidad integral</option><option>Planillas y laboral</option><option>Asesoría tributaria</option><option>Fiscalización / SUNAT</option><option>Contrato / documento legal</option><option>Constitución de empresa</option><option>Regularización contable o tributaria</option><option>Declaración / trámite específico</option><option>Due diligence / revisión</option><option>Otro servicio específico</option>
+</select></div>
+</div>
+</div>
+
+<div class="panel" id="recurrPanel">
+<div class="section-title">Detalle de servicio recurrente</div>
+<div class="grid">
+<div><label>Ventas/comprobantes por mes</label><input id="ventas" type="number" min="0" value="0"></div>
+<div><label>Compras/comprobantes por mes</label><input id="compras" type="number" min="0" value="0"></div>
+<div><label>Movimientos bancarios aprox. / mes</label><input id="movbanco" type="number" min="0" value="0"></div>
+<div><label>Cuentas bancarias</label><input id="bancos" type="number" min="0" value="1"></div>
+<div><label>Trabajadores</label><input id="trabajadores" type="number" min="0" value="0"></div>
+<div><label>Locales / sedes</label><input id="sedes" type="number" min="1" value="1"></div>
+<div><label>Software actual</label><input id="software" placeholder="Concar, Odoo, Excel, otro"></div>
+<div><label>Días esperados para cierre</label><input id="cierre" type="number" min="1" value="10"></div>
+<div class="full"><div class="checks">
+<label class="check"><input type="checkbox" data-rec value="Inventarios" data-p="6"> Inventarios</label>
+<label class="check"><input type="checkbox" data-rec value="Importaciones/exportaciones" data-p="7"> Importaciones / exportaciones</label>
+<label class="check"><input type="checkbox" data-rec value="Moneda extranjera" data-p="4"> Moneda extranjera</label>
+<label class="check"><input type="checkbox" data-rec value="Detracciones frecuentes" data-p="5"> Detracciones frecuentes</label>
+<label class="check"><input type="checkbox" data-rec value="No domiciliados" data-p="7"> No domiciliados</label>
+<label class="check"><input type="checkbox" data-rec value="Activos fijos relevantes" data-p="4"> Activos fijos relevantes</label>
+<label class="check"><input type="checkbox" data-rec value="Centros de costos" data-p="5"> Centros de costos</label>
+<label class="check"><input type="checkbox" data-rec value="Matriz extranjera / vinculadas" data-p="9"> Matriz extranjera / vinculadas</label>
+<label class="check"><input type="checkbox" data-rec value="EEFF mensuales" data-p="6"> EEFF mensuales</label>
+<label class="check"><input type="checkbox" data-rec value="Reportes gerenciales" data-p="6"> Reportes gerenciales</label>
+<label class="check"><input type="checkbox" data-rec value="Contabilidad atrasada" data-p="10"> Contabilidad atrasada</label>
+<label class="check"><input type="checkbox" data-rec value="Fiscalización / contingencia vigente" data-p="10"> Fiscalización / contingencia vigente</label>
+</div></div>
+</div>
+</div>
+
+<div class="panel hide" id="puntPanel">
+<div class="section-title">Detalle de servicio puntual</div>
+<div class="grid">
+<div><label>Cantidad de documentos / entregables</label><input id="entregables" type="number" min="1" value="1"></div>
+<div><label>Urgencia</label><select id="urgencia"><option value="normal">Normal</option><option value="48h">48 horas</option><option value="24h">24 horas</option></select></div>
+<div><label>Número de entidades / partes involucradas</label><input id="partes" type="number" min="1" value="1"></div>
+<div><label>Número de periodos a revisar</label><input id="periodos" type="number" min="1" value="1"></div>
+<div class="full"><label>Alcance específico</label><textarea id="alcance" placeholder="Ej.: contrato de prestación de servicios, respuesta a requerimiento, rectificatoria, revisión de 3 periodos, etc."></textarea></div>
+<div class="full"><div class="checks">
+<label class="check"><input type="checkbox" data-pun value="Revisión documental extensa" data-p="5"> Revisión documental extensa</label>
+<label class="check"><input type="checkbox" data-pun value="Investigación normativa" data-p="6"> Investigación normativa</label>
+<label class="check"><input type="checkbox" data-pun value="Reunión con cliente / tercero" data-p="4"> Reunión con cliente / tercero</label>
+<label class="check"><input type="checkbox" data-pun value="Coordinación con notaría / entidad" data-p="5"> Coordinación con notaría / entidad</label>
+<label class="check"><input type="checkbox" data-pun value="Respuesta a SUNAT / entidad" data-p="8"> Respuesta a SUNAT / entidad</label>
+<label class="check"><input type="checkbox" data-pun value="Sustento contable y tributario" data-p="8"> Sustento contable y tributario</label>
+<label class="check"><input type="checkbox" data-pun value="Documento bilingüe" data-p="5"> Documento bilingüe</label>
+<label class="check"><input type="checkbox" data-pun value="Alta exposición / riesgo" data-p="10"> Alta exposición / riesgo</label>
+</div></div>
+</div>
+</div>
+
+<div class="panel">
+<div class="section-title">Condiciones comerciales y alcance</div>
+<div class="grid">
+<div><label>Reuniones incluidas</label><input id="reuniones" type="number" min="0" value="1"></div>
+<div><label>Responsable del cliente definido</label><select id="responsable"><option>Sí</option><option>No</option></select></div>
+<div><label>Documentación completa</label><select id="docs"><option>Sí</option><option>Parcial</option><option>No</option></select></div>
+<div><label>¿Requiere propuesta formal?</label><select id="propuesta"><option>Sí</option><option>No</option></select></div>
+<div class="full"><label>Observaciones / riesgos / exclusiones</label><textarea id="obs"></textarea></div>
+</div>
+<div class="actions"><button class="btn primary" onclick="calcular()">Calcular cotización recomendada</button><button class="btn secondary" onclick="limpiar()">Limpiar</button></div>
+<div class="note">Resultado interno. Antes de enviar al cliente, valida alcance, documentación, impuestos, gastos de terceros y cualquier servicio adicional.</div>
+</div>
+
+<div class="panel result" id="resultado"><span class="badge" id="nivel"></span><div class="price" id="precio"></div><div class="summary" id="resumen"></div><div class="actions"><button class="btn primary" onclick="copiar()">Copiar resumen</button></div></div>
+</div>
+
+<script>
+function n(id){return Number(document.getElementById(id).value||0)}
+function v(id){return document.getElementById(id).value.trim()}
+function check(sel){return [...document.querySelectorAll(sel+':checked')]}
+function toggleTipo(){const p=document.getElementById('tipo').value==='puntual';document.getElementById('puntPanel').classList.toggle('hide',!p);document.getElementById('recurrPanel').classList.toggle('hide',p)}
+function toggleServicio(){const s=document.getElementById('servicio').value;if(['Contrato / documento legal','Constitución de empresa','Regularización contable o tributaria','Declaración / trámite específico','Due diligence / revisión','Otro servicio específico','Fiscalización / SUNAT'].includes(s)){document.getElementById('tipo').value='puntual'}else{document.getElementById('tipo').value='recurrente'}toggleTipo()}
+function calcular(){
+ const tipo=document.getElementById('tipo').value, servicio=document.getElementById('servicio').value;
+ let puntos=0, base=0, min=0, max=0, nivel='';
+ if(tipo==='recurrente'){
+   const mov=n('ventas')+n('compras');
+   if(mov<=40)puntos+=4; else if(mov<=100)puntos+=8; else if(mov<=250)puntos+=15; else puntos+=24;
+   puntos+=Math.min(12,Math.ceil(n('movbanco')/100)*2);
+   puntos+=Math.min(8,Math.max(0,n('bancos')-2));
+   const t=n('trabajadores'); if(t>0&&t<=10)puntos+=4; else if(t<=30&&t>10)puntos+=8; else if(t>30)puntos+=14;
+   puntos+=Math.min(6,Math.max(0,n('sedes')-1)*2);
+   check('[data-rec]').forEach(x=>puntos+=Number(x.dataset.p||0));
+   if(servicio==='Planillas y laboral'){base=Math.max(150,t<=10?150:150+(t-10)*15)}
+   else if(puntos<=14)base=300; else if(puntos<=28)base=650; else if(puntos<=44)base=1200; else if(puntos<=62)base=2200; else base=3500;
+   nivel=puntos<=14?'Básico':puntos<=28?'Estándar':puntos<=44?'Intermedio':puntos<=62?'Complejo':'Corporativo';
+   min=Math.max(150,Math.round(base*.95/50)*50);max=Math.round(base*1.2/50)*50;
+ } else {
+   let score=0;
+   score+=Math.min(12,n('entregables')*2);
+   score+=Math.min(10,n('partes')*2);
+   score+=Math.min(12,n('periodos')*2);
+   check('[data-pun]').forEach(x=>score+=Number(x.dataset.p||0));
+   if(document.getElementById('urgencia').value==='48h')score+=6;
+   if(document.getElementById('urgencia').value==='24h')score+=12;
+   const bases={'Contrato / documento legal':350,'Constitución de empresa':450,'Regularización contable o tributaria':450,'Declaración / trámite específico':250,'Due diligence / revisión':700,'Fiscalización / SUNAT':600,'Otro servicio específico':300,'Asesoría tributaria':350};
+   base=bases[servicio]||300;
+   base+=score*25;
+   nivel=score<=10?'Simple':score<=24?'Moderado':score<=40?'Complejo':'Alta complejidad';
+   min=Math.max(250,Math.round(base*.9/50)*50);max=Math.round(base*1.15/50)*50;puntos=score;
+ }
+ if(document.getElementById('docs').value==='No'){min=Math.round(min*1.15/50)*50;max=Math.round(max*1.2/50)*50}
+ const rec=check('[data-rec]').map(x=>x.value), pun=check('[data-pun]').map(x=>x.value);
+ const L=[];
+ L.push('EMPRESA: '+(v('empresa')||'-'));L.push('RUC: '+(v('ruc')||'-'));L.push('CONTACTO: '+(v('contacto')||'-'));L.push('CORREO: '+(v('correo')||'-'));L.push('');
+ L.push('TIPO: '+(tipo==='recurrente'?'Servicio recurrente / mensual':'Servicio puntual / único'));L.push('SERVICIO PRINCIPAL: '+servicio);L.push('COMPLEJIDAD: '+nivel);L.push('PUNTAJE INTERNO: '+puntos);L.push('');
+ if(tipo==='recurrente'){L.push('VOLUMEN: '+n('ventas')+' ventas / '+n('compras')+' compras / '+n('movbanco')+' mov. bancarios');L.push('TRABAJADORES: '+n('trabajadores'));L.push('FACTORES: '+(rec.join(', ')||'Sin adicionales'))}
+ else{L.push('ENTREGABLES: '+n('entregables'));L.push('PERIODOS: '+n('periodos'));L.push('URGENCIA: '+document.getElementById('urgencia').value);L.push('ALCANCE: '+(v('alcance')||'-'));L.push('FACTORES: '+(pun.join(', ')||'Sin adicionales'))}
+ L.push('');L.push('RANGO RECOMENDADO: S/ '+min.toLocaleString('es-PE')+' – S/ '+max.toLocaleString('es-PE')+' + IGV');L.push('DOCUMENTACIÓN: '+document.getElementById('docs').value);L.push('REUNIONES INCLUIDAS: '+n('reuniones'));L.push('OBSERVACIONES: '+(v('obs')||'-'));L.push('');L.push('*Validar gastos notariales, registrales, tasas, traducciones, legalizaciones u otros terceros por separado cuando corresponda.*');
+ document.getElementById('nivel').textContent='Complejidad: '+nivel;document.getElementById('precio').textContent='Rango recomendado: S/ '+min.toLocaleString('es-PE')+' – S/ '+max.toLocaleString('es-PE')+' + IGV';document.getElementById('resumen').textContent=L.join('\n');document.getElementById('resultado').style.display='block';document.getElementById('resultado').scrollIntoView({behavior:'smooth'});
+}
+async function copiar(){await navigator.clipboard.writeText(document.getElementById('resumen').textContent);alert('Resumen copiado')}
+function limpiar(){location.reload()}
+toggleTipo()
+</script>
+</body>
+</html>
