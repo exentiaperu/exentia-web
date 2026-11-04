@@ -37,7 +37,7 @@ label{display:block;font-size:.84rem;font-weight:800;color:var(--navy);margin-bo
 <div><label>Ventas / comprobantes al mes</label><input id="ventas" type="number" min="0" value="0"></div>
 <div><label>Compras / comprobantes al mes</label><input id="compras" type="number" min="0" value="0"></div>
 <div><label>Trabajadores</label><input id="trabajadores" type="number" min="0" value="0"></div>
-<div><label>Cuentas bancarias activas</label><input id="bancos" type="number" min="0" value="1"></div>
+<div><label>Número de cuentas bancarias activas</label><input id="bancos" type="number" min="0" value="1"><div class="note">Cuenta cada cuenta por separado, aunque estén en el mismo banco o en distinta moneda.</div></div>
 
 <div class="full"><div class="section-title">Tipo de necesidad</div><div class="checks">
 <label class="check"><input type="radio" name="tipo" value="Recurrente" checked> Servicio recurrente / mensual</label>
@@ -106,6 +106,7 @@ function calcular(){
    base=Math.max(150,trab<=10?150:150+(trab-10)*15);
  }
  const factores=selected('[data-factor]');
+ const recomendado=Math.round(((min+max)/2)/50)*50;
  const lineas=[];
  lineas.push('EMPRESA: '+(v('empresa')||'-'));
  lineas.push('RUC: '+(v('ruc')||'-'));
@@ -147,7 +148,6 @@ function calcular(){
    const puntual=servicios.some(s=>['Contrato / documento legal','Carta / escrito / respuesta','Declaración o trámite específico','Constitución de empresa','Due diligence / revisión','Regularización contable o tributaria','Otro servicio específico'].includes(s));
    if(puntual){min=Math.max(250,min);max=Math.max(500,max)}
  }
- const recomendado=Math.round(((min+max)/2)/50)*50;
  document.getElementById('precio').innerHTML='Mínimo: S/ '+min.toLocaleString('es-PE')+' · <strong>Recomendado: S/ '+recomendado.toLocaleString('es-PE')+'</strong> · Máximo: S/ '+max.toLocaleString('es-PE')+' + IGV';
  document.getElementById('resumen').textContent=resumen;
  document.getElementById('resultado').style.display='block';
