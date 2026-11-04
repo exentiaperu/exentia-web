@@ -1,0 +1,20 @@
+{
+  "routes": [
+    {
+      "route": "/login",
+      "redirect": "/.auth/login/aad?post_login_redirect_uri=/diagnostico/"
+    },
+    {
+      "route": "/diagnostico*",
+      "allowedRoles": [
+        "admin_exentia"
+      ]
+    }
+  ],
+  "responseOverrides": {
+    "401": {
+      "statusCode": 302,
+      "redirect": "/.auth/login/aad?post_login_redirect_uri=/diagnostico/"
+    }
+  }
+}
