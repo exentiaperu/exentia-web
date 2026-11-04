@@ -122,19 +122,8 @@ function ver(id){
   document.getElementById('detallePanel').scrollIntoView({behavior:'smooth'});
 }
 
-async function editar(id){
-  const x=cotizaciones.find(q=>q.id===id); if(!x)return;
-  const precio=prompt('Nuevo precio ofrecido sin IGV:',x.precioOfrecido||x.recomendado||0);
-  if(precio===null)return;
-  const estado=prompt('Estado: Borrador, Enviada, Negociación, Aprobada, Rechazada, Cliente cerrado o Archivada',x.estado||'Borrador');
-  if(estado===null)return;
-  const observaciones=prompt('Observaciones comerciales:',x.observacionesComerciales||'');
-  if(observaciones===null)return;
-  try{
-    const d=await api('PUT',{id,precioOfrecido:Number(precio||0),estado,observacionesComerciales:observaciones});
-    const i=cotizaciones.findIndex(q=>q.id===id); cotizaciones[i]=d.quote; render(); ver(id);
-    alert('Cotización actualizada. Se guardó como versión '+d.quote.version+'.');
-  }catch(e){alert(e.message)}
+function editar(id){
+  window.location.href='/diagnostico/completo/?editar='+encodeURIComponent(id);
 }
 
 async function eliminar(id){

@@ -203,24 +203,71 @@ function calcular(){
  L.push('MÁXIMO SUGERIDO: S/ '+max.toLocaleString('es-PE')+' + IGV');L.push('DOCUMENTACIÓN: '+document.getElementById('docs').value);L.push('REUNIONES INCLUIDAS: '+n('reuniones'));L.push('OBSERVACIONES: '+(v('obs')||'-'));L.push('');L.push('*Validar gastos notariales, registrales, tasas, traducciones, legalizaciones u otros terceros por separado cuando corresponda.*');
  document.getElementById('nivel').textContent='Complejidad: '+nivel;document.getElementById('precio').innerHTML='Mínimo: S/ '+min.toLocaleString('es-PE')+' · <strong>Recomendado: S/ '+recomendado.toLocaleString('es-PE')+'</strong> · Máximo: S/ '+max.toLocaleString('es-PE')+' + IGV';document.getElementById('resumen').textContent=L.join('\n');window.ultimaCotizacion={empresa:v('empresa'),ruc:v('ruc'),contacto:v('contacto'),correo:v('correo'),tipo,servicio,nivel,min,recomendado,max,estado:'Borrador',resumen:L.join('\n'),observacionesComerciales:v('obs')};document.getElementById('resultado').style.display='block';document.getElementById('resultado').scrollIntoView({behavior:'smooth'});
 }
+function recolectarFormulario(){
+ const ids=['empresa','ruc','contacto','correo','tipo','servicio','ventas','ventasMonto','compras','movbanco','bancos','trabajadores','sedes','software','cierre','entregables','urgencia','partes','periodos','alcance','honorarioAbogada','gestionLegal','reuniones','responsable','docs','propuesta','obs'];
+ const datos={};
+ ids.forEach(id=>{const el=document.getElementById(id);if(el)datos[id]=el.type==='number'?Number(el.value||0):el.value});
+ datos.rec=check('[data-rec]').map(x=>x.value);
+ datos.pun=check('[data-pun]').map(x=>x.value);
+ return datos;
+}
+function aplicarFormulario(datos){
+ if(!datos)return;
+ Object.entries(datos).forEach(([id,val])=>{
+   if(id==='rec'||id==='pun')return;
+   const el=document.getElementById(id);
+   if(el && val!==undefined && val!==null)el.value=val;
+ });
+ document.querySelectorAll('[data-rec],[data-pun]').forEach(x=>x.checked=false);
+ (datos.rec||[]).forEach(v=>{const el=[...document.querySelectorAll('[data-rec]')].find(x=>x.value===v);if(el)el.checked=true});
+ (datos.pun||[]).forEach(v=>{const el=[...document.querySelectorAll('[data-pun]')].find(x=>x.value===v);if(el)el.checked=true});
+ toggleTipo();
+ const s=document.getElementById('servicio').value;
+ const legal=['Contrato / documento legal','Constitución de empresa'].includes(s);
+ document.getElementById('legalPartnerBox').classList.toggle('hide',!legal);
+}
+async function cargarEdicion(){
+ const id=new URLSearchParams(location.search).get('editar');
+ if(!id)return;
+ try{
+   const r=await fetch('/api/cotizaciones');
+   const d=await r.json();
+   if(!r.ok)throw new Error(d.error||'No se pudo cargar la cotización');
+   const q=(d.quotes||[]).find(x=>x.id===id);
+   if(!q)throw new Error('Cotización no encontrada');
+   window.cotizacionEditando=q;
+   aplicarFormulario(q.formulario||{
+     empresa:q.empresa,ruc:q.ruc,contacto:q.contacto,correo:q.correo,tipo:q.tipo,servicio:q.servicio,obs:q.observacionesComerciales||''
+   });
+   document.querySelector('.muted').textContent='Editando cotización · versión '+(q.version||1);
+   alert('Cotización cargada. Modifica lo necesario y vuelve a calcular antes de guardar.');
+ }catch(e){alert(e.message)}
+}
 async function guardarCotizacion(){
  const q=window.ultimaCotizacion;
  if(!q){alert('Primero calcula la cotización.');return}
  if(!q.empresa && !q.ruc){alert('Ingresa al menos la empresa o el RUC antes de guardar.');return}
- const precio=prompt('Precio que ofrecerás al cliente, sin IGV:',q.recomendado);
+ const precio=prompt('Precio que ofrecerás al cliente, sin IGV:',window.cotizacionEditando?.precioOfrecido||q.recomendado);
  if(precio===null)return;
  q.precioOfrecido=Number(precio||q.recomendado);
+ q.formulario=recolectarFormulario();
+ const edit=window.cotizacionEditando;
+ if(edit){
+   q.id=edit.id;
+   q.estado=edit.estado||q.estado;
+ }
  try{
-   const r=await fetch('/api/cotizaciones',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(q)});
+   const r=await fetch('/api/cotizaciones',{method:edit?'PUT':'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(q)});
    const d=await r.json();
    if(!r.ok)throw new Error(d.error||'No se pudo guardar');
-   alert('Cotización guardada correctamente como versión 1.');
+   alert(edit?'Cotización actualizada como versión '+d.quote.version+'.':'Cotización guardada correctamente como versión 1.');
    window.location.href='/diagnostico/cotizaciones/';
  }catch(e){alert(e.message)}
 }
 async function copiar(){await navigator.clipboard.writeText(document.getElementById('resumen').textContent);alert('Resumen copiado')}
 function limpiar(){location.reload()}
 toggleServicio()
+cargarEdicion()
 </script>
 </body>
 </html>
