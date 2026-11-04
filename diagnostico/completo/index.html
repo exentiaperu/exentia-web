@@ -116,7 +116,7 @@ label{display:block;font-size:.83rem;font-weight:800;color:var(--navy);margin-bo
 <div class="note">Resultado interno. Antes de enviar al cliente, valida alcance, documentación, impuestos, gastos de terceros y cualquier servicio adicional.</div>
 </div>
 
-<div class="panel result" id="resultado"><span class="badge" id="nivel"></span><div class="price" id="precio"></div><div class="summary" id="resumen"></div><div class="actions"><button class="btn primary" onclick="copiar()">Copiar resumen</button></div></div>
+<div class="panel result" id="resultado"><span class="badge" id="nivel"></span><div class="price" id="precio"></div><div class="summary" id="resumen"></div><div class="actions"><button class="btn primary" onclick="guardarCotizacion()">Guardar cotización</button><button class="btn secondary" onclick="copiar()">Copiar resumen</button><a class="btn secondary" href="/diagnostico/cotizaciones/" style="text-decoration:none">Ver historial</a></div></div>
 </div>
 
 <script>
@@ -201,7 +201,22 @@ function calcular(){
  L.push('MÍNIMO SUGERIDO: S/ '+min.toLocaleString('es-PE')+' + IGV');
  L.push('RECOMENDADO: S/ '+recomendado.toLocaleString('es-PE')+' + IGV');
  L.push('MÁXIMO SUGERIDO: S/ '+max.toLocaleString('es-PE')+' + IGV');L.push('DOCUMENTACIÓN: '+document.getElementById('docs').value);L.push('REUNIONES INCLUIDAS: '+n('reuniones'));L.push('OBSERVACIONES: '+(v('obs')||'-'));L.push('');L.push('*Validar gastos notariales, registrales, tasas, traducciones, legalizaciones u otros terceros por separado cuando corresponda.*');
- document.getElementById('nivel').textContent='Complejidad: '+nivel;document.getElementById('precio').innerHTML='Mínimo: S/ '+min.toLocaleString('es-PE')+' · <strong>Recomendado: S/ '+recomendado.toLocaleString('es-PE')+'</strong> · Máximo: S/ '+max.toLocaleString('es-PE')+' + IGV';document.getElementById('resumen').textContent=L.join('\n');document.getElementById('resultado').style.display='block';document.getElementById('resultado').scrollIntoView({behavior:'smooth'});
+ document.getElementById('nivel').textContent='Complejidad: '+nivel;document.getElementById('precio').innerHTML='Mínimo: S/ '+min.toLocaleString('es-PE')+' · <strong>Recomendado: S/ '+recomendado.toLocaleString('es-PE')+'</strong> · Máximo: S/ '+max.toLocaleString('es-PE')+' + IGV';document.getElementById('resumen').textContent=L.join('\n');window.ultimaCotizacion={empresa:v('empresa'),ruc:v('ruc'),contacto:v('contacto'),correo:v('correo'),tipo,servicio,nivel,min,recomendado,max,estado:'Borrador',resumen:L.join('\n'),observacionesComerciales:v('obs')};document.getElementById('resultado').style.display='block';document.getElementById('resultado').scrollIntoView({behavior:'smooth'});
+}
+async function guardarCotizacion(){
+ const q=window.ultimaCotizacion;
+ if(!q){alert('Primero calcula la cotización.');return}
+ if(!q.empresa && !q.ruc){alert('Ingresa al menos la empresa o el RUC antes de guardar.');return}
+ const precio=prompt('Precio que ofrecerás al cliente, sin IGV:',q.recomendado);
+ if(precio===null)return;
+ q.precioOfrecido=Number(precio||q.recomendado);
+ try{
+   const r=await fetch('/api/cotizaciones',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(q)});
+   const d=await r.json();
+   if(!r.ok)throw new Error(d.error||'No se pudo guardar');
+   alert('Cotización guardada correctamente como versión 1.');
+   window.location.href='/diagnostico/cotizaciones/';
+ }catch(e){alert(e.message)}
 }
 async function copiar(){await navigator.clipboard.writeText(document.getElementById('resumen').textContent);alert('Resumen copiado')}
 function limpiar(){location.reload()}
