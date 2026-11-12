@@ -189,6 +189,46 @@ footer{background:#dce5ed !important}
   }
 }
 
+
+
+/* EXENTIA service list structural fix v3 — 2026-11-12 */
+/* Correct list structure: transparent wrapper + compact individual rows */
+.soft .list{
+  background:transparent !important;
+  border:0 !important;
+  border-radius:0 !important;
+  padding:0 !important;
+  box-shadow:none !important;
+  min-height:0 !important;
+  height:auto !important;
+  display:grid !important;
+  gap:10px !important;
+}
+.soft .list > div{
+  background:#ffffff !important;
+  color:#2f4357 !important;
+  border:1px solid #c4d0db !important;
+  border-radius:12px !important;
+  padding:13px 16px !important;
+  min-height:0 !important;
+  height:auto !important;
+  line-height:1.5 !important;
+  box-shadow:none !important;
+}
+.soft .list > div strong{
+  color:#0b2748 !important;
+}
+.soft .list > div::before{
+  color:#0b63ce !important;
+}
+@media(max-width:820px){
+  .soft .list{gap:8px !important}
+  .soft .list > div{
+    padding:12px 14px !important;
+    border-radius:10px !important;
+  }
+}
+
 </style>
 </head>
 <body>
