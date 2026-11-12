@@ -26,6 +26,127 @@ section{padding:66px 0}.intro{max-width:820px}.intro h2,.section-head h2{font-si
 .sources{font-size:.82rem;color:var(--muted);margin-top:20px}.sources a{color:var(--blue);font-weight:700}
 footer{border-top:1px solid var(--line);padding:32px 0;color:var(--muted);font-size:.85rem}.footer-row{display:flex;justify-content:space-between;gap:20px}
 @media(max-width:900px){.nav-links{display:none}.hero-grid,.two{grid-template-columns:1fr}.grid,.related{grid-template-columns:1fr 1fr}.cta{grid-template-columns:1fr}}@media(max-width:620px){.nav>.btn{display:none}.grid,.related{grid-template-columns:1fr}.hero{padding-top:44px}.footer-row{flex-direction:column}}
+
+
+/* EXENTIA service-page reading contrast v1 — 2026-11-12 */
+/* Visual-only reading contrast refinement for service pages */
+:root{
+  --page-bg:#edf2f6;
+  --plane:#dbe5ee;
+  --plane-deep:#d0dce7;
+  --surface:#ffffff;
+  --surface-soft:#f8fbfd;
+  --ink-strong:#0b2748;
+  --ink-body:#4c5f72;
+  --line-strong:#c5d1dc;
+  --blue-focus:#0b63ce;
+}
+body{background:var(--page-bg) !important;color:#16283a}
+header{background:rgba(255,255,255,.98) !important;border-bottom:1px solid #dbe3ea !important}
+
+/* Hero remains bright but not washed out */
+.hero{
+  background:
+    radial-gradient(circle at 88% 10%,rgba(11,99,206,.08),transparent 32%),
+    linear-gradient(180deg,#ffffff 0%,#f1f6fa 100%) !important;
+}
+.crumbs{color:#5a6d7f !important}
+.eyebrow{color:var(--blue-focus) !important}
+.hero h1{color:var(--ink-strong) !important}
+.hero p{color:#3e5368 !important}
+.hero-box{
+  background:#fff !important;
+  border-color:#c9d6e1 !important;
+  box-shadow:0 18px 44px rgba(8,28,51,.09) !important;
+}
+
+/* Intro cards: clear white reading surfaces on tinted canvas */
+.intro{
+  background:var(--plane) !important;
+  border-top:1px solid #c6d2dd !important;
+  border-bottom:1px solid #c6d2dd !important;
+}
+.intro .section-head p{color:#465c70 !important}
+.grid{gap:16px !important}
+.card{
+  background:#fff !important;
+  border-color:var(--line-strong) !important;
+  box-shadow:none !important;
+}
+.card:hover{
+  background:#fbfdff !important;
+  border-color:#aebfd0 !important;
+}
+.card h3{color:var(--ink-strong) !important}
+.card p{color:var(--ink-body) !important}
+.n{color:var(--blue-focus) !important;background:#e8f2fd !important}
+
+/* Soft informational section: deeper plane, white content */
+.soft{
+  background:var(--plane-deep) !important;
+  border-top:1px solid #bbc9d5 !important;
+  border-bottom:1px solid #bbc9d5 !important;
+}
+.soft .two{
+  gap:24px !important;
+}
+.soft .section-head h2,
+.soft h3{color:var(--ink-strong) !important}
+.soft .section-head p,
+.soft p,
+.soft li{color:#45596c !important}
+.list{
+  background:#fff !important;
+  border:1px solid #c2cfda !important;
+  border-radius:10px !important;
+  padding:24px 26px !important;
+}
+.list li{border-color:#e0e6eb !important}
+
+/* Related services: back to white so cards stand out */
+.related{
+  background:#fff !important;
+  border-top:1px solid #d6dfe7 !important;
+  border-bottom:1px solid #d6dfe7 !important;
+}
+.related .card{
+  background:#f9fbfd !important;
+}
+.related .card:hover{
+  background:#eef5fb !important;
+}
+
+/* Sources, when present */
+.sources{
+  background:#eef3f7 !important;
+  border-top:1px solid #d1dbe4 !important;
+}
+.sources p,.sources li{color:#4f6172 !important}
+
+/* Strong close/conversion area */
+.cta{
+  background:linear-gradient(135deg,#081d35 0%,#0e3a6c 100%) !important;
+  color:#fff !important;
+}
+.cta h2{color:#fff !important}
+.cta p{color:#d9e5f0 !important}
+.cta .btn-light{background:#fff !important;color:#0b315d !important;border-color:#fff !important}
+
+/* Readability and interaction */
+.section-head h2{color:var(--ink-strong) !important}
+.section-head p{color:var(--ink-body) !important}
+.btn-blue{background:var(--blue-focus) !important}
+.btn-blue:hover{background:#084f9f !important}
+.btn-light:hover{background:#f3f7fb !important}
+footer{background:#dce5ed !important}
+.footer-row{border-color:#c6d1db !important;color:#55687a !important}
+
+@media(max-width:820px){
+  .intro{background:#e5edf4 !important}
+  .soft{background:#dde6ee !important}
+  .list{padding:20px !important}
+}
+
 </style>
 </head>
 <body>
