@@ -164,6 +164,20 @@ footer{padding:34px 0}.footer-row{padding-top:24px;border-top:1px solid var(--li
   .hero-services-float div{font-size:.84rem;padding:10px 2px}
 }
 
+.home-insights{background:#fff;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.home-insights .section-head{margin-bottom:30px}
+.home-insights-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.home-insight-card{display:block;background:#fff;border:1px solid var(--line);border-radius:22px;overflow:hidden;transition:.22s;box-shadow:0 8px 26px rgba(15,48,90,.035)}
+.home-insight-card:hover{transform:translateY(-5px);box-shadow:var(--shadow)}
+.home-insight-img{height:170px;background-position:center;background-size:cover;position:relative}
+.home-insight-img:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(8,36,72,.02),rgba(8,36,72,.12))}
+.home-insight-body{padding:20px 22px 22px}
+.home-insight-tag{display:inline-flex;padding:6px 10px;border-radius:999px;background:#eaf3ff;color:#0757bd;font-size:.72rem;font-weight:850;text-transform:uppercase;letter-spacing:.04em}
+.home-insight-body h3{margin-top:11px;color:var(--navy);font-size:1.05rem;line-height:1.35}
+.home-insight-body p{margin-top:8px;color:var(--muted);font-size:.9rem}
+.home-insight-cta{margin-top:28px;text-align:center}
+@media(max-width:900px){.home-insights-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:620px){.home-insights-grid{grid-template-columns:1fr}}
 </style>
 
 <script type="application/ld+json">
@@ -191,7 +205,11 @@ footer{padding:34px 0}.footer-row{padding-top:24px;border-top:1px solid var(--li
 <section id="nosotros"><div class="container"><div class="section-head reveal"><span>Por qué EXENTIA</span><h2>Más que contabilidad, acompañamiento para tu negocio.</h2><p>Combinamos experiencia técnica, criterio profesional y herramientas digitales para ayudarte a mantener el control de tu empresa con información clara y oportuna.</p></div><div class="proof-grid"><div class="proof-main reveal"><div class="big" style="font-size:clamp(2.8rem,6vw,5.2rem);line-height:1.02;">Trayectoria que genera confianza.</div><p style="margin-top:22px;">Experiencia en gestión contable, tributaria y atención de situaciones complejas para empresas locales y multinacionales.</p></div><div class="proof-stack"><div class="proof-card reveal"><strong>Experiencia ante SUNAT</strong><p>Atención de fiscalizaciones, esquelas, requerimientos y otros procedimientos tributarios.</p></div><div class="proof-card reveal"><strong>Equipo especializado</strong><p>Acompañamiento cercano, ordenado y con criterio profesional.</p></div><div class="proof-card reveal"><strong>Tecnología aplicada</strong><p>Herramientas digitales e inteligencia artificial para optimizar procesos y mejorar la información.</p></div></div></div></div></section>
 <section class="process" id="como-trabajamos"><div class="container"><div class="section-head center reveal"><span>Cómo trabajamos</span><h2>Un proceso claro desde el primer día.</h2><p>Queremos que contratar y trabajar con EXENTIA sea sencillo, ordenado y transparente.</p></div><div class="steps"><article class="step reveal"><div class="step-num">01</div><h3>Conocemos tu empresa</h3><p>Revisamos tu actividad, obligaciones, volumen de operaciones y necesidades para entender cómo podemos ayudarte.</p></article><article class="step reveal"><div class="step-num">02</div><h3>Organizamos y gestionamos</h3><p>Ordenamos la información contable, tributaria y laboral para mantener tus procesos al día y reducir contingencias.</p></article><article class="step reveal"><div class="step-num">03</div><h3>Te acompañamos</h3><p>Recibes seguimiento, reportes y orientación para tomar decisiones con mayor claridad y seguridad.</p></article></div><div class="process-note reveal">Sin complicaciones. Sin información innecesaria. Con acompañamiento profesional.</div></div></section>
 
-<section id="insights"><div class="container"><div class="section-head center reveal"><span>Insights</span><h2>Actualidad y casos prácticos para tomar mejores decisiones.</h2><p>Noticias, análisis, asientos contables, alertas SUNAT y contenido tributario, laboral y legal para empresas.</p><div style="margin-top:24px"><a class="btn btn-primary" href="/insights/">Ver EXENTIA Insights</a></div></div></div></section>
+<section id="insights" class="home-insights"><div class="container"><div class="section-head center reveal"><span>EXENTIA Insights</span><h2>Información práctica para tomar mejores decisiones empresariales.</h2><p>Análisis sobre SUNAT, tributación, contabilidad, laboral y gestión empresarial, preparados con enfoque técnico y aplicación práctica.</p></div><div class="home-insights-grid">
+<a class="home-insight-card reveal" href="/insights/fiscalizacion-parcial-electronica-sunat/"><div class="home-insight-img" style="background-image:url('https://images.unsplash.com/photo-1554224154-26032ffc0d07?auto=format&fit=crop&w=900&q=82')"></div><div class="home-insight-body"><span class="home-insight-tag">Caso práctico</span><h3>Fiscalización parcial electrónica SUNAT: cómo responder en 10 días hábiles</h3><p>Plazos, sustento y decisiones clave ante una fiscalización electrónica.</p></div></a>
+<a class="home-insight-card reveal" href="/insights/sire-sunat-2026-regularizacion-multas/"><div class="home-insight-img" style="background-image:url('https://images.unsplash.com/photo-1450101499163-c8848c66ca85?auto=format&fit=crop&w=900&q=82')"></div><div class="home-insight-body"><span class="home-insight-tag">Alerta SUNAT</span><h3>SIRE: facilidades para regularizar infracciones hasta febrero de 2027</h3><p>Qué revisar y qué empresas deberían actuar antes del vencimiento.</p></div></a>
+<a class="home-insight-card reveal" href="/insights/outsourcing-contable-cuando-conviene/"><div class="home-insight-img" style="background-image:url('https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=900&q=82')"></div><div class="home-insight-body"><span class="home-insight-tag">Outsourcing</span><h3>¿Cuándo conviene tercerizar la contabilidad de una empresa?</h3><p>Señales, controles y criterios para evaluar un proveedor contable.</p></div></a>
+</div><div class="home-insight-cta reveal"><a class="btn btn-primary" href="/insights/">Ver todos los Insights</a></div></div></section>
 <section class="faq" id="preguntas">
   <div class="container">
     <div class="section-head center reveal">
