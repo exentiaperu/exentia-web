@@ -324,6 +324,119 @@ footer{background:#fff}
   .highlight,.proof-main,.contact-copy,form{padding:32px 26px}
 }
 
+
+
+/* EXENTIA color depth refinement v3 — 2026-11-12 */
+/* Color and contrast only — preserve structure and behavior. */
+:root{
+  --navy:#081c33;
+  --navy2:#0f3768;
+  --blue:#0a67d8;
+  --blue-deep:#084e9e;
+  --blue-soft:#eaf3ff;
+  --blue-mist:#f3f7fc;
+  --gold:#c3a35a;
+  --sand:#e9dfc9;
+  --paper:#f4f6f8;
+  --ink:#15263a;
+  --muted:#5f6f80;
+  --line:#d9e1e8;
+}
+
+/* Global interaction contrast */
+a:focus-visible,.btn:focus-visible,summary:focus-visible,input:focus,select:focus,textarea:focus{
+  outline:3px solid rgba(10,103,216,.18);
+  outline-offset:2px;
+}
+nav a{transition:color .18s ease}
+nav a:hover{color:var(--blue)}
+.btn-primary{background:var(--navy)}
+.btn-primary:hover{background:#0d315d}
+.hero-actions .btn-primary{background:var(--blue)}
+.hero-actions .btn-primary:hover{background:var(--blue-deep)}
+.btn-light:hover{background:#f5f8fc;border-color:#8da9c7}
+
+/* Add controlled depth across the homepage */
+.hero{background:linear-gradient(180deg,#ffffff 0%,#f7faff 100%)}
+h1 span,.eyebrow,.section-head span{color:var(--blue)}
+.trust-row span:before{color:var(--blue)}
+.hero-services-float{border-color:#d3e1f0}
+.hero-services-float div:before{background-color:var(--blue-soft)}
+.benefits-strip{background:#eef4fa}
+.benefit{border-color:#d6e0ea}
+.benefit-icon{background:#dcecff;color:var(--blue-deep)}
+
+/* Services section: visually anchor the content */
+.services{background:#fbfcfe}
+.services-grid{border-color:#cfd9e2}
+.service-card{background:#ffffff}
+.service-card:nth-child(2),.service-card:nth-child(5){background:#f5f8fc}
+.service-card:hover{background:#edf5ff}
+.service-no{color:var(--blue-deep)}
+.service-card h3{color:#092545}
+
+/* Stronger section alternation */
+.highlight{
+  background:linear-gradient(135deg,#081c33 0%,#0c315d 72%,#10447d 100%);
+}
+.highlight-price{background:#f1e7cf;color:#092545}
+.proof-main{
+  background:linear-gradient(145deg,#0a203b 0%,#123f70 100%);
+}
+.proof-main .big{color:#f0dfb4}
+.proof-card{background:#fbfcfe}
+.proof-card strong{color:#0a2b51}
+
+/* Process should feel distinct from content above/below */
+.process{background:#eef3f8;border-color:#d7e0e8}
+.step-num{color:var(--blue-deep)}
+.step h3,.process-note{color:#09294d}
+
+/* Insights with stronger content hierarchy */
+.home-insights{background:#f9fbfd}
+.home-insight-card{background:#fff;border-color:#d7e0e8}
+.home-insight-card:hover{border-color:#b7cbe0}
+.home-insight-card h3{color:#09294d}
+
+/* FAQ needs more definition while remaining light */
+.faq{background:#edf3f8}
+.faq-item{background:#fff;border-color:#d7e0e8}
+.faq-item[open]{border-color:#b8caDC;box-shadow:0 8px 20px rgba(11,52,97,.05)}
+.faq-item summary{color:#0a2a50}
+.faq-item summary:after{color:var(--blue)}
+
+/* Contact finish: stronger conversion area */
+.contact-wrap{background:#fff;border-color:#cfd9e3}
+.contact-copy{
+  background:linear-gradient(145deg,#081c33 0%,#0e3562 100%);
+}
+.contact-copy p{color:#d8e2ee}
+.contact-data{color:#f5f8fb}
+label{color:#0a2a50}
+input,select,textarea{
+  border-color:#ccd8e3;
+  background:#fbfdff;
+}
+input:focus,select:focus,textarea:focus{
+  border-color:#7ba8d8;
+  background:#fff;
+}
+
+/* Footer and floating action harmony */
+footer{background:#f7f9fb}
+.footer-row{border-color:#dce3e9}
+.floating-wa::before{background:rgba(37,211,102,.20)}
+
+/* Subtle text contrast uplift */
+.section-head p,.service-card p,.proof-card p,.step p,.faq-answer,.form-note{color:#5a6978}
+.hero-copy{color:#344a61}
+
+@media(max-width:820px){
+  .services{background:#fff}
+  .service-card:nth-child(2),.service-card:nth-child(5){background:#f8fafc}
+  .process{background:#f1f5f9}
+}
+
 </style>
 
 <script type="application/ld+json">
