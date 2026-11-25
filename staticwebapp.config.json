@@ -1,6 +1,12 @@
 {
   "routes": [
     {
+      "route": "/api/auth-check",
+      "allowedRoles": [
+        "admin_exentia"
+      ]
+    },
+    {
       "route": "/api/cotizaciones*",
       "allowedRoles": [
         "admin_exentia"
