@@ -13,39 +13,25 @@ const site=encodeURIComponent(process.env.EXENTIA_SITE_ID).replace(/%2C/g,',');
 const r=await fetch('https://graph.microsoft.com/v1.0/sites/'+site+'/lists?$select=id&$top=1',{headers:{Authorization:'Bearer '+access}});
 const result={configured,graph:true,listsReadable:r.ok,listsStatus:r.status};
 if(req.query?.write!=='1')return out(200,result);
-const base='https://graph.microsoft.com/v1.0/sites/'+site+'/lists';
+const authSite='exentiaperu.sharepoint.com,83fe5fa6-0387-4129-aa04-df303819ba9f,b58b1829-7753-4222-adb9-f8688809869b';
+const itemUrl='https://graph.microsoft.com/v1.0/sites/'+authSite+'/lists/17f3bba3-a178-4d54-996b-fce9c541e482/items/1';
 const headers={Authorization:'Bearer '+access,'Content-Type':'application/json'};
-const name='EXENTIA Auth Probe '+crypto.randomUUID();
-const created=await fetch(base,{method:'POST',headers,body:JSON.stringify({displayName:name,list:{template:'genericList'}})});
-result.listCreateStatus=created.status;
-if(!created.ok)return out(200,result);
-const id=(await created.json()).id;
-if(!id)return out(503,{...result,cleanup:false});
-const url=base+'/'+encodeURIComponent(id);
-try{
- const item=await fetch(url+'/items',{method:'POST',headers,body:JSON.stringify({fields:{Title:'Auth infrastructure probe'}})});
- result.itemCreateStatus=item.status;
- if(item.ok){
- const obj=await item.json();
- const itemUrl=url+'/items/'+encodeURIComponent(obj.id);
- const read=await fetch(itemUrl+'?$expand=fields',{headers});
- result.itemReadStatus=read.status;
- if(read.ok){
- const data=await read.json();
- const etag=data.eTag||data['@odata.etag'];
- if(etag){
- const updated=await fetch(itemUrl+'/fields',{method:'PATCH',headers:{...headers,'If-Match':etag},body:JSON.stringify({Title:'Auth infrastructure probe updated'})});
- result.conditionalUpdateStatus=updated.status;
- if(updated.ok){
- const stale=await fetch(itemUrl+'/fields',{method:'PATCH',headers:{...headers,'If-Match':etag},body:JSON.stringify({Title:'Stale update test'})});
- result.staleUpdateRejected=stale.status===412;
+const read=await fetch(itemUrl+'?$expand=fields',{headers});
+result.authReadStatus=read.status;
+if(!read.ok)return out(200,result);
+const item=await read.json();
+const etag=item.eTag||item['@odata.etag'];
+const state=item.fields?.AuthState;
+if(item.fields?.Title!=='admin'||typeof state!=='string'||!etag)return out(200,{...result,recordValid:false});
+try{const parsed=JSON.parse(state);result.recordValid=parsed.version===1&&Array.isArray(parsed.sessions)&&Number.isInteger(parsed.failedAttempts)&&Number.isFinite(parsed.lockedUntil);}catch(e){result.recordValid=false;}
+if(!result.recordValid)return out(200,result);
+const updated=await fetch(itemUrl+'/fields',{method:'PATCH',headers:{...headers,'If-Match':etag},body:JSON.stringify({AuthState:state})});
+result.authWriteStatus=updated.status;
+if(updated.ok){
+ const after=await fetch(itemUrl+'?$expand=fields',{headers});
+ if(after.ok){const data=await after.json();const newTag=data.eTag||data['@odata.etag'];result.statePreserved=data.fields?.AuthState===state;result.etagChanged=!!newTag&&newTag!==etag;
+ if(result.etagChanged){const stale=await fetch(itemUrl+'/fields',{method:'PATCH',headers:{...headers,'If-Match':etag},body:JSON.stringify({AuthState:state})});result.staleUpdateRejected=stale.status===412;}
  }
- }else result.etagPresent=false;
- }
- }
-}finally{
- const cleanup=await fetch(url,{method:'DELETE',headers});
- result.cleanupStatus=cleanup.status;result.cleanup=cleanup.ok;
 }
 return out(200,result);
 }catch(e){return out(503,{ok:false,message:'No se pudo verificar la infraestructura.'})}
