@@ -741,10 +741,10 @@ function sendWhatsApp(){if(!valid())return;const d=data();const t=`Hola EXENTIA,
 function sendEmail(){if(!valid())return;const d=data();const s=`Consulta EXENTIA - ${d.servicio}`;const b=`Hola EXENTIA,\n\nQuisiera solicitar información.\n\nNombre / empresa: ${d.nombre}\nCorreo: ${d.correo}\nTeléfono: ${d.telefono||'No indicado'}\nServicio: ${d.servicio}\n\nMensaje:\n${d.mensaje||'Quisiera recibir información sobre este servicio.'}`;window.location.href=`mailto:contacto@exentia.pe?subject=${encodeURIComponent(s)}&body=${encodeURIComponent(b)}`}
 (async function showInternalPanel(){
   try{
-    const r=await fetch('/.auth/me',{credentials:'same-origin'});
+    const r=await fetch('/api/auth-local',{credentials:'same-origin',cache:'no-store'});
     if(!r.ok)return;
     const data=await r.json();
-    const roles=(data&&data.clientPrincipal&&data.clientPrincipal.userRoles)||[];
+    const roles=data&&data.authenticated?['admin_exentia']:[];
     if(roles.includes('admin_exentia')){
       const item=document.getElementById('internalNav');
       if(item)item.style.display='';

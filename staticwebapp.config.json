@@ -1,35 +1,12 @@
 {
   "routes": [
     {
-      "route": "/api/auth-check",
-      "allowedRoles": [
-        "admin_exentia"
-      ]
-    },
-    {
-      "route": "/api/cotizaciones*",
-      "allowedRoles": [
-        "admin_exentia"
-      ]
-    },
-    {
       "route": "/login",
-      "redirect": "/.auth/login/aad?post_login_redirect_uri=/diagnostico/"
+      "redirect": "/acceso.html"
     },
     {
-      "route": "/diagnostico*",
-      "allowedRoles": [
-        "admin_exentia"
-      ]
+      "route": "/api/auth-check",
+      "statusCode": 404
     }
-  ],
-  "responseOverrides": {
-    "401": {
-      "statusCode": 302,
-      "redirect": "/.auth/login/aad?post_login_redirect_uri=/diagnostico/"
-    },
-    "403": {
-      "rewrite": "/acceso-denegado.html"
-    }
-  }
+  ]
 }

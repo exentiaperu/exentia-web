@@ -131,6 +131,8 @@ function json(status, body) {
 
 module.exports = async function (context, req) {
   try {
+    if(!await require("../auth-local/index.js").requireSession(req)){context.res=json(403,{ok:false,error:"Sesión EXENTIA requerida"});return;}
+    if((req.method||"GET").toUpperCase()!=="GET"&&(req.headers.origin!=="https://exentia.pe"||!(req.headers["content-type"]||"").toLowerCase().startsWith("application/json"))){context.res=json(403,{ok:false,error:"Solicitud no autorizada"});return;}
     const token = await getToken();
     const method = (req.method || "GET").toUpperCase();
     let quotes = await readQuotes(token);
