@@ -77,3 +77,4 @@ async function handler(context,req){
  }catch(e){return reply(context,503,{ok:false,message:'Servicio temporalmente no disponible.'});}
 }
 module.exports=handler;
+module.exports.requireSession=async function(req){const c=config();const t=token(req);if(!t)return false;const {s}=await read(await headers());return s.sessions.some(x=>x.id===digest(t,c.key));};

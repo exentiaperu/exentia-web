@@ -1,0 +1,1 @@
+module.exports=async function(context,req){try{const ok=await require('../auth-local/index.js').requireSession(req);context.res={status:ok?200:403,headers:{'Cache-Control':'no-store','Content-Type':'application/json'},body:{authorized:ok}}}catch(e){context.res={status:503,headers:{'Cache-Control':'no-store','Content-Type':'application/json'},body:{authorized:false}}}};
