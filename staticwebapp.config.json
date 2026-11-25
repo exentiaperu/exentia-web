@@ -7,6 +7,14 @@
     {
       "route": "/api/auth-check",
       "statusCode": 404
+    },
+    {
+      "route": "/api/session-check",
+      "statusCode": 404
+    },
+    {
+      "route": "/acceso-denegado.html",
+      "redirect": "/acceso.html"
     }
   ]
 }
