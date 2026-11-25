@@ -11,6 +11,42 @@ if(!token.ok)return out(503,{configured,graph:false});
 const access=(await token.json()).access_token;
 const site=encodeURIComponent(process.env.EXENTIA_SITE_ID).replace(/%2C/g,',');
 const r=await fetch('https://graph.microsoft.com/v1.0/sites/'+site+'/lists?$select=id&$top=1',{headers:{Authorization:'Bearer '+access}});
-return out(200,{configured,graph:true,listsReadable:r.ok,listsStatus:r.status});
+const result={configured,graph:true,listsReadable:r.ok,listsStatus:r.status};
+if(req.query?.write!=='1')return out(200,result);
+const base='https://graph.microsoft.com/v1.0/sites/'+site+'/lists';
+const headers={Authorization:'Bearer '+access,'Content-Type':'application/json'};
+const name='EXENTIA Auth Probe '+crypto.randomUUID();
+const created=await fetch(base,{method:'POST',headers,body:JSON.stringify({displayName:name,list:{template:'genericList'}})});
+result.listCreateStatus=created.status;
+if(!created.ok)return out(200,result);
+const id=(await created.json()).id;
+if(!id)return out(503,{...result,cleanup:false});
+const url=base+'/'+encodeURIComponent(id);
+try{
+ const item=await fetch(url+'/items',{method:'POST',headers,body:JSON.stringify({fields:{Title:'Auth infrastructure probe'}})});
+ result.itemCreateStatus=item.status;
+ if(item.ok){
+ const obj=await item.json();
+ const itemUrl=url+'/items/'+encodeURIComponent(obj.id);
+ const read=await fetch(itemUrl+'?$expand=fields',{headers});
+ result.itemReadStatus=read.status;
+ if(read.ok){
+ const data=await read.json();
+ const etag=data.eTag||data['@odata.etag'];
+ if(etag){
+ const updated=await fetch(itemUrl+'/fields',{method:'PATCH',headers:{...headers,'If-Match':etag},body:JSON.stringify({Title:'Auth infrastructure probe updated'})});
+ result.conditionalUpdateStatus=updated.status;
+ if(updated.ok){
+ const stale=await fetch(itemUrl+'/fields',{method:'PATCH',headers:{...headers,'If-Match':etag},body:JSON.stringify({Title:'Stale update test'})});
+ result.staleUpdateRejected=stale.status===412;
+ }
+ }else result.etagPresent=false;
+ }
+ }
+}finally{
+ const cleanup=await fetch(url,{method:'DELETE',headers});
+ result.cleanupStatus=cleanup.status;result.cleanup=cleanup.ok;
+}
+return out(200,result);
 }catch(e){return out(503,{ok:false,message:'No se pudo verificar la infraestructura.'})}
 };
