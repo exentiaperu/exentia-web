@@ -21,6 +21,9 @@
     "401": {
       "statusCode": 302,
       "redirect": "/.auth/login/aad?post_login_redirect_uri=/diagnostico/"
+    },
+    "403": {
+      "rewrite": "/acceso-denegado.html"
     }
   }
 }
